@@ -96,11 +96,11 @@ sealed class Requester<T>(url: String = "",
 
     fun addData(output:OutputStream) {
         output.write(when(Requester@ this) {
-            is JsonPost -> (mData as String).toByteArray()
+            is JsonPost -> (mData as String?)?.toByteArray()
             else -> {
                 var looped = false
                 var tmpData: String = ""
-                (mData as ArrayList<Pair<String, String>>)?.forEach{
+                (mData as ArrayList<Pair<String, String>>?)?.forEach{
                     tmpData = tmpData + if (!looped) "" else "&" + "${it.first}=${it.second}"
                 }
                 tmpData.toByteArray()
