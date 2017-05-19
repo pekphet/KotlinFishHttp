@@ -1,5 +1,6 @@
 package cn.fish.kfish.net
 
+import cn.fish.kfish.ZLog
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -63,13 +64,14 @@ sealed class Requester<T>(url: String = "",
         try {
             var isLooped = false
             mUrlParam?.forEach {
-                mUrl = mUrl + if (isLooped) {
+                mUrl = mUrl + if (!isLooped) {
                     isLooped = true
                     "?"
                 } else "&"
                 mUrl = mUrl + "${it.first}=${it.second}"
             }
             var conn = URL(mUrl).openConnection() as HttpURLConnection
+            ZLog.e("URL", mUrl)
             conn.connectTimeout = CONN_TIMEOUT
             conn.doInput = true
             conn.useCaches = false
@@ -90,6 +92,7 @@ sealed class Requester<T>(url: String = "",
             mConn = conn
             return conn
         } catch (e: Exception) {
+            e.printStackTrace()
             return null
         }
     }

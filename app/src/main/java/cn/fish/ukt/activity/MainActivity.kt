@@ -24,9 +24,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    var up = ArrayList<Pair<String, String>>()
 
     fun tryNet() {
-        var req = Requester.SimplePost<String>(url = "http://www.baidu.com", callback = object : KFishHttpCallback<String>{
+        up.add(Pair("content", "123123"))
+        var req = Requester.SimplePost<String>(url = "http://192.168.1.201:59001", urlParam = up, callback = object : KFishHttpCallback<String>{
             override fun Failed(msg: String) {
                 super.Failed(msg)
                 ZLog.e("failed", msg)
