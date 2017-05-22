@@ -2,6 +2,8 @@ package cn.fish.kfish;
 
 import org.junit.Test;
 
+import cn.fish.kfish.domain.Data;
+
 import static org.junit.Assert.*;
 
 /**
@@ -13,5 +15,10 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() throws Exception {
         assertEquals(4, 2 + 2);
+    }
+
+    @Test
+    public void test_json() {
+        System.out.println(new Data.Person("Kotlin", 1).toJson());
     }
 }

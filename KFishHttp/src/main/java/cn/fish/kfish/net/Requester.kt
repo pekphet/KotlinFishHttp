@@ -1,6 +1,7 @@
 package cn.fish.kfish.net
 
 import cn.fish.kfish.ZLog
+import cn.fish.kfish.domain.Jsonable
 import java.io.OutputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -8,9 +9,9 @@ import java.net.URL
 /**
  * Created by fish on 17-5-19.
  */
-sealed class Requester<T>(url: String = "",
-                          urlParam: ArrayList<Pair<String, String>>? = null,
-                          headerParam: ArrayList<Pair<String, String>>? = null,
+sealed class Requester<T : Jsonable>(url: String = "",
+                          urlParam: List<Pair<String, String>>? = null,
+                          headerParam: List<Pair<String, String>>? = null,
                           callback: KFishHttpCallback<T>? = null,
                           data: Any? = null) {
     companion object {
@@ -20,33 +21,33 @@ sealed class Requester<T>(url: String = "",
 
     var mConn: HttpURLConnection? = null
     var mUrl = url
-    var mUrlParam: ArrayList<Pair<String, String>>? = urlParam
-    var mHeaderParam: ArrayList<Pair<String, String>>? = headerParam
+    var mUrlParam: List<Pair<String, String>>? = urlParam
+    var mHeaderParam: List<Pair<String, String>>? = headerParam
     var mCallback: KFishHttpCallback<T>? = callback
     var mData: Any? = data
 
 
-    class SimpleGet<T>(url: String,
-                       urlParam: ArrayList<Pair<String, String>>? = null,
-                       headerParam: ArrayList<Pair<String, String>>? = null,
+    class SimpleGet<T : Jsonable>(url: String,
+                       urlParam: List<Pair<String, String>>? = null,
+                       headerParam: List<Pair<String, String>>? = null,
                        callback: KFishHttpCallback<T>? = null) : Requester<T>(url, urlParam, headerParam, callback)
 
-    class ParamGet<T>(url: String,
-                      urlParam: ArrayList<Pair<String, String>>? = null,
-                      headerParam: ArrayList<Pair<String, String>>? = null,
+    class ParamGet<T : Jsonable>(url: String,
+                      urlParam: List<Pair<String, String>>? = null,
+                      headerParam: List<Pair<String, String>>? = null,
                       callback: KFishHttpCallback<T>? = null) : Requester<T>(url, urlParam, headerParam, callback)
 
-    class SimplePost<T>(url: String,
-                        urlParam: ArrayList<Pair<String, String>>? = null,
-                        headerParam: ArrayList<Pair<String, String>>? = null,
+    class SimplePost<T : Jsonable>(url: String,
+                        urlParam: List<Pair<String, String>>? = null,
+                        headerParam: List<Pair<String, String>>? = null,
                         callback: KFishHttpCallback<T>? = null,
-                        data: ArrayList<Pair<String, String>>? = null) : Requester<T>(url, urlParam, headerParam, callback, data)
+                        data: List<Pair<String, String>>? = null) : Requester<T>(url, urlParam, headerParam, callback, data)
 
-    class FormPost<T>(url: String,
-                      urlParam: ArrayList<Pair<String, String>>? = null,
-                      headerParam: ArrayList<Pair<String, String>>? = null,
+    class FormPost<T : Jsonable>(url: String,
+                      urlParam: List<Pair<String, String>>? = null,
+                      headerParam: List<Pair<String, String>>? = null,
                       callback: KFishHttpCallback<T>? = null,
-                      data: ArrayList<Pair<String, String>>) : Requester<T>(url, urlParam, headerParam, callback, data)
+                      data: List<Pair<String, String>>) : Requester<T>(url, urlParam, headerParam, callback, data)
 
 //    class UploadFile<T>(url: String,
 //                        urlParam: ArrayList<Pair<String, String>>? = null,
@@ -54,9 +55,9 @@ sealed class Requester<T>(url: String = "",
 //                        callback: KFishHttpCallback<T>? = null,
 //                        file: String) : Requester<T>(url, urlParam, headerParam, callback)
 
-    class JsonPost<T>(url: String,
-                      urlParam: ArrayList<Pair<String, String>>? = null,
-                      headerParam: ArrayList<Pair<String, String>>? = null,
+    class JsonPost<T : Jsonable>(url: String,
+                      urlParam: List<Pair<String, String>>? = null,
+                      headerParam: List<Pair<String, String>>? = null,
                       callback: KFishHttpCallback<T>? = null,
                       json: String) : Requester<T>(url, urlParam, headerParam, callback, json)
 
@@ -97,13 +98,13 @@ sealed class Requester<T>(url: String = "",
         }
     }
 
-    fun addData(output:OutputStream) {
-        output.write(when(Requester@ this) {
+    fun addData(output: OutputStream) {
+        output.write(when (Requester@ this) {
             is JsonPost -> (mData as String?)?.toByteArray()
             else -> {
                 var looped = false
                 var tmpData: String = ""
-                (mData as ArrayList<Pair<String, String>>?)?.forEach{
+                (mData as ArrayList<Pair<String, String>>?)?.forEach {
                     tmpData = tmpData + if (!looped) "" else "&" + "${it.first}=${it.second}"
                 }
                 tmpData.toByteArray()
@@ -111,9 +112,5 @@ sealed class Requester<T>(url: String = "",
         })
         output.flush()
         output.close()
-    }
-
-    fun trans(respStr: String) : T {
-        return respStr as T
     }
 }
